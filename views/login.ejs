@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gray-100 flex items-center justify-center">
+  <div class="w-full max-w-md bg-white shadow-lg rounded-xl p-6">
+    <h1 class="text-2xl font-bold text-center mb-4">Login</h1>
+
+    <% if (error) { %>
+      <div class="mb-4 p-3 rounded bg-red-100 text-red-700 text-sm"><%= error %></div>
+    <% } %>
+
+    <form action="/login" method="POST" class="space-y-4">
+      <!-- Email -->
+      <div>
+        <label class="block text-sm mb-1">Email</label>
+        <input
+          type="email"
+          name="email"
+          value="<%= old.email %>"
+          class="w-full border rounded-md p-2 outline-none focus:ring"
+          placeholder="example@mail.com"
+          required
+        />
+      </div>
+
+      <!-- Password -->
+      <div>
+        <label class="block text-sm mb-1">Password</label>
+        <input
+          type="password"
+          name="password"
+          class="w-full border rounded-md p-2 outline-none focus:ring"
+          placeholder="Apna password daalo"
+          required
+        />
+      </div>
+
+      <button
+        type="submit"
+        class="w-full py-2 rounded-md font-semibold bg-black text-white hover:opacity-90"
+      >
+        Login
+      </button>
+    </form>
+
+    <p class="text-sm text-gray-600 mt-4">
+      Abhi account nahi hai? <a href="/signup" class="underline">Sign Up karo</a>
+    </p>
+  </div>
+</body>
+</html>

@@ -1,20 +1,14 @@
-// Hinglish: Controller me business logic hota hai (signup dikhao, signup process karo)
-
 const bcrypt = require("bcrypt");
 const User = require("../models/User");
 
-// GET /signup → form dikhana
+// ---------------- SIGNUP (pehle se bana hua) ----------------
 exports.showSignup = (req, res) => {
-  // Hinglish: error aur old values pass kar rahe taaki form me dikhe
   res.render("signup", { error: null, old: { username: "", email: "" } });
 };
 
-// POST /signup → form submit handle
 exports.handleSignup = async (req, res) => {
   try {
     const { username, email, password } = req.body;
-
-    // --- Basic validations (school level) ---
     if (!username || !email || !password) {
       return res.status(400).render("signup", {
         error: "Please sab fields fill karo.",
@@ -22,16 +16,6 @@ exports.handleSignup = async (req, res) => {
       });
     }
 
-    // Simple email check
-    const emailOk = /^\S+@\S+\.\S+$/.test(email);
-    if (!emailOk) {
-      return res.status(400).render("signup", {
-        error: "Valid email daalo.",
-        old: { username, email }
-      });
-    }
-
-    // Email already registered?
     const exists = await User.findOne({ email });
     if (exists) {
       return res.status(400).render("signup", {
@@ -40,24 +24,66 @@ exports.handleSignup = async (req, res) => {
       });
     }
 
-    // Password hash
-    const passwordHash = await bcrypt.hash(password, 10); // Hinglish: 10 = saltRounds
-
-    // Save user
+    const passwordHash = await bcrypt.hash(password, 10);
     await User.create({ username, email, passwordHash });
-
-    // Success → welcome page
     return res.redirect("/welcome");
   } catch (err) {
-    console.error(err);
     return res.status(500).render("signup", {
-      error: "Server error aaya. Thoda baad try karo.",
+      error: "Server error aaya.",
       old: { username: req.body.username || "", email: req.body.email || "" }
     });
   }
 };
 
-// GET /welcome → success page
+// ---------------- LOGIN (NEW) ----------------
+
+// GET /login → login form dikhana
+exports.showLogin = (req, res) => {
+  res.render("login", { error: null, old: { email: "" } });
+};
+
+// POST /login → form submit handle
+exports.handleLogin = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    // Check empty fields
+    if (!email || !password) {
+      return res.status(400).render("login", {
+        error: "Email aur password dono daalo.",
+        old: { email }
+      });
+    }
+
+    // User find karo
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(400).render("login", {
+        error: "User nahi mila. Pehle sign up karo.",
+        old: { email }
+      });
+    }
+
+    // Password compare
+    const match = await bcrypt.compare(password, user.passwordHash);
+    if (!match) {
+      return res.status(400).render("login", {
+        error: "Galat password hai.",
+        old: { email }
+      });
+    }
+
+    // Agar sab sahi hai → welcome page dikhao
+    return res.redirect("/welcome");
+  } catch (err) {
+    return res.status(500).render("login", {
+      error: "Server error aaya.",
+      old: { email: req.body.email || "" }
+    });
+  }
+};
+
+// ---------------- WELCOME PAGE ----------------
 exports.showWelcome = (req, res) => {
   res.render("welcome");
 };

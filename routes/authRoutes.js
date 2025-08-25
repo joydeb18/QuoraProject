@@ -11,6 +11,10 @@ router.get("/", (req, res) => res.redirect("/signup"));
 router.get("/signup", authController.showSignup);
 router.post("/signup", authController.handleSignup);
 
+// Login
+router.get("/login", authController.showLogin);
+router.post("/login", authController.handleLogin);
+
 // Welcome (success page)
 router.get("/welcome", authController.showWelcome);
 
