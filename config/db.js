@@ -1,9 +1,9 @@
 // Hinglish: Ye file sirf database se connect hone ka kaam karti hai.
-
 const mongoose = require("mongoose");
+require("dotenv").config(); // .env file se variables load karne ke liye
 
-const MONGO_URI = "mongodb://127.0.0.1:27017/signupDB"; 
 // Hinglish: Compass me ye DB naam (signupDB) automatic create ho jayega jab hum data save karenge.
+const MONGO_URI = process.env.MONGO_URI;
 
 async function connectDB() {
   try {

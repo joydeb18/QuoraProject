@@ -1,89 +1,95 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/User");
 
-// ---------------- SIGNUP (pehle se bana hua) ----------------
-exports.showSignup = (req, res) => {
-  res.render("signup", { error: null, old: { username: "", email: "" } });
-};
-
+// POST /signup → Naya User Register karna
 exports.handleSignup = async (req, res) => {
   try {
     const { username, email, password } = req.body;
+    // Check karo ki saari fields aayi hain ya nahi
     if (!username || !email || !password) {
-      return res.status(400).render("signup", {
-        error: "Please sab fields fill karo.",
-        old: { username, email }
+      return res.status(400).json({ 
+        success: false, 
+        message: "Please sab fields fill karo." 
       });
     }
 
-    const exists = await User.findOne({ email });
-    if (exists) {
-      return res.status(400).render("signup", {
-        error: "Ye email already registered hai.",
-        old: { username, email }
+    // Check karo ki email pehle se registered to nahi hai
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Ye email already registered hai." 
       });
     }
 
+    // Password ko hash (encrypt) karo
     const passwordHash = await bcrypt.hash(password, 10);
-    await User.create({ username, email, passwordHash });
-    return res.redirect("/welcome");
+
+    // Naya user database mein save karo
+    const newUser = await User.create({ username, email, passwordHash });
+
+    // Success hone par JSON response bhejo
+    return res.status(201).json({ 
+      success: true, 
+      message: "User successfully register ho gaya!",
+      user: { id: newUser._id, username: newUser.username, email: newUser.email }
+    });
+
   } catch (err) {
-    return res.status(500).render("signup", {
-      error: "Server error aaya.",
-      old: { username: req.body.username || "", email: req.body.email || "" }
+    // Agar koi server error aaye
+    return res.status(500).json({ 
+      success: false, 
+      message: "Server error aaya.", 
+      error: err.message 
     });
   }
 };
 
-// ---------------- LOGIN (NEW) ----------------
 
-// GET /login → login form dikhana
-exports.showLogin = (req, res) => {
-  res.render("login", { error: null, old: { email: "" } });
-};
-
-// POST /login → form submit handle
+// POST /login → User ko Login karana
 exports.handleLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Check empty fields
+    // Check karo ki fields khaali na ho
     if (!email || !password) {
-      return res.status(400).render("login", {
-        error: "Email aur password dono daalo.",
-        old: { email }
+      return res.status(400).json({ 
+        success: false, 
+        message: "Email aur password dono daalo." 
       });
     }
 
-    // User find karo
+    // Database mein user ko email se dhoondo
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(400).render("login", {
-        error: "User nahi mila. Pehle sign up karo.",
-        old: { email }
+      return res.status(404).json({ // 404 Not Found status code
+        success: false, 
+        message: "Is email se koi user nahi mila." 
       });
     }
 
-    // Password compare
-    const match = await bcrypt.compare(password, user.passwordHash);
-    if (!match) {
-      return res.status(400).render("login", {
-        error: "Galat password hai.",
-        old: { email }
+    // User ke diye gaye password aur database ke hash password ko compare karo
+    const isMatch = await bcrypt.compare(password, user.passwordHash);
+    if (!isMatch) {
+      return res.status(401).json({ // 401 Unauthorized status code
+        success: false, 
+        message: "Galat password hai." 
       });
     }
 
-    // Agar sab sahi hai → welcome page dikhao
-    return res.redirect("/welcome");
+    // Agar sab sahi hai → success ka JSON response bhejo
+    return res.status(200).json({
+      success: true,
+      message: "Login successful!",
+      user: { id: user._id, username: user.username, email: user.email }
+    });
+
   } catch (err) {
-    return res.status(500).render("login", {
-      error: "Server error aaya.",
-      old: { email: req.body.email || "" }
+    // Agar koi server error aaye
+    return res.status(500).json({ 
+      success: false, 
+      message: "Server error aaya.", 
+      error: err.message 
     });
   }
-};
-
-// ---------------- WELCOME PAGE ----------------
-exports.showWelcome = (req, res) => {
-  res.render("welcome");
 };

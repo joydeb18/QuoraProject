@@ -1,21 +1,17 @@
-// Hinglish: Routes sirf URL ko controller functions se map karte hain.
-
+// Hinglish: Routes sirf API endpoints ko controller functions se map karte hain.
 const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/authController");
 
-// Home → redirect to signup
-router.get("/", (req, res) => res.redirect("/signup"));
+// Home Route - API status check karne ke liye
+router.get("/", (req, res) => {
+  res.json({ message: "API is working fine! ✅" });
+});
 
-// Signup form + submit
-router.get("/signup", authController.showSignup);
+// Signup ka POST route
 router.post("/signup", authController.handleSignup);
 
-// Login
-router.get("/login", authController.showLogin);
+// Login ka POST route
 router.post("/login", authController.handleLogin);
-
-// Welcome (success page)
-router.get("/welcome", authController.showWelcome);
 
 module.exports = router;
