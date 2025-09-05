@@ -7,6 +7,8 @@
 const express = require("express");
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
+const cors = require("cors"); 
+require('dotenv').config();
 
 // Step 1: Database se connect karna
 // Manager sabse pehle kitchen (DB) check kar raha hai ki woh taiyar hai ya nahi.
@@ -16,6 +18,7 @@ connectDB();
 // Manager ne restaurant (app) ko khol diya hai.
 const app = express();
 const PORT = 5000; // Restaurant ka address/phone number.
+app.use(cors()); // CORS middleware ko use karna
 
 // Step 3: Middleware Setup
 // Manager ne waiter ko instruction diya hai ki customer (request) se jo bhi order (data) mile,
