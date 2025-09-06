@@ -1,3 +1,6 @@
+.env file
+
+
 MONGO_URI=mongodb://127.0.0.1:27017/blogDB
 JWT_SECRET=ye-mera-bahut-hi-secret-stamp-hai-12345
-ADMIN_MASTER_KEY=12345678
+ADMIN_MASTER_KEY=1234567890

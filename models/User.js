@@ -1,32 +1,26 @@
-// models/User.js
+const mongoose = require('mongoose');
 
-const mongoose = require("mongoose");
-
-// Hinglish: Hum yahan 'User' dish ki recipe (Schema) likh rahe hain.
-const userSchema = new mongoose.Schema(
-  {
-    // Ingredient 1: username, jo text (String) hona chahiye aur zaroori (required) hai.
-    username: {
-      type: String,
-      required: true,
-    },
-    // Ingredient 2: email, jo text ho, zaroori ho, aur har dish ke liye unique ho.
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-    // Ingredient 3: passwordHash, jo text ho aur zaroori ho.
-    passwordHash: {
-      type: String,
-      required: true,
-    },
+// User ka schema, jismein 'role' bhi hai
+const userSchema = new mongoose.Schema({
+  username: {
+    type: String,
+    required: true,
   },
-  // Hinglish: Hum is recipe mein 'timestamps' bhi add kar rahe hain.
-  // Isse har dish ke banne (createdAt) aur update hone (updatedAt) ka time automatically note ho jayega.
-  { timestamps: true }
-);
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  passwordHash: { // Hum password ko hash karke isme save karenge
+    type: String,
+    required: true,
+  },
+  role: {
+    type: String,
+    enum: ['user', 'admin'], // Sirf yeh do values ho sakti hain.
+    default: 'user',        // Har naya user automatic 'user' hi banega.
+  },
+});
 
-// Hinglish: Is recipe (schema) ko use karke hum ek actual dish-making model bana rahe hain,
-// jiska naam 'User' hai. Ab hum is model se users bana payenge.
-module.exports = mongoose.model("User", userSchema);
+const User = mongoose.model('User', userSchema);
+module.exports = User;

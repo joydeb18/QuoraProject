@@ -1,23 +1,22 @@
 const express = require("express");
 const router = express.Router();
-const authController = require("../controllers/authController");
-const authMiddleware = require("../middleware/authMiddleware"); // <-- Bouncer ko import karo
 
-// ... (purane routes waise hi rahenge) ...
-router.get("/", (req, res) => res.json({ message: "API is working fine! ✅" }));
+const authController = require("../controllers/authController");
+const authMiddleware = require("../middleware/authMiddleware");
+
+// Route 1: Signup ke liye
 router.post("/signup", authController.handleSignup);
+
+// Route 2: Login ke liye
 router.post("/login", authController.handleLogin);
 
-// === NAYA PROTECTED ROUTE ===
-// Hinglish: Yeh ek special VIP section hai.
-// Is route par aane se pehle, customer ko bouncer (authMiddleware) se check karwana padega.
+// Route 3: Protected Profile Route
 router.get("/profile", authMiddleware, (req, res) => {
-    // Agar bouncer ne aapko andar aane diya, to iska matlab token valid hai.
-    // Bouncer ne user ki ID `req.user` me daal di thi, hum use yahan access kar sakte hain.
+    // yeh route sirf tabhi chalega jab token valid hoga
     res.json({
         success: true,
         message: "Welcome to your profile!",
-        user: req.user // Yeh user ID token se aa rahi hai
+        user: req.user
     });
 });
 

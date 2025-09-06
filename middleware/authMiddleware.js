@@ -1,29 +1,28 @@
-// Hinglish: Yeh hamara bouncer hai jo VIP card check karega.
 const jwt = require('jsonwebtoken');
 
-module.exports = function(req, res, next) {
-    // Step 1: Bouncer customer se card maang raha hai.
-    // VIP card aam taur par request ke 'headers' me 'x-auth-token' naam se bheja jaata hai.
+// Yeh function ek "Bouncer" ki tarah kaam karta hai
+const authMiddleware = (req, res, next) => {
+    // 1. Bouncer check karega ki customer ke paas ticket (token) hai ya nahi
     const token = req.header('x-auth-token');
 
-    // Step 2: Agar customer ke paas card hi nahi hai.
+    // 2. Agar ticket hi nahi hai, toh entry mat do
     if (!token) {
-        return res.status(401).json({ success: false, message: 'Koi token nahi hai, access denied.' });
+        return res.status(401).json({ success: false, message: 'No token, authorization denied.' });
     }
 
-    // Step 3: Agar card hai, to uski jaanch karna.
     try {
-        // Bouncer manager ke secret stamp (JWT_SECRET) se card ko verify kar raha hai.
+        // 3. Agar ticket hai, toh check karo ki woh asli hai ya nakli
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-        // Agar card asli hai, to card par likhi user ki ID ko request me daal do.
-        // Taki aage Chef ko pata chale ki yeh kaun sa user hai.
+        // 4. Agar ticket asli hai, toh customer ki ID ko request mein daal do
         req.user = decoded.user;
         
-        // Aur customer ko andar jaane do.
+        // 5. Bouncer customer ko andar aane ki permission de raha hai
         next();
     } catch (err) {
-        // Step 4: Agar card nakli (invalid) ya expired hai.
-        res.status(401).json({ success: false, message: 'Token valid nahi hai.' });
+        // 6. Agar ticket nakli (invalid) nikla, toh entry mat do
+        res.status(401).json({ success: false, message: 'Token is not valid.' });
     }
 };
+
+module.exports = authMiddleware;
