@@ -16,6 +16,10 @@ mongoose.connect(process.env.MONGO_URI, {})
 
 // API Routes
 app.use('/', require('./routes/authRoutes'));
+// === YEH NAYI LINE ADD KARNI HAI ===
+// Jab bhi koi request '/api/users' par aaye, toh userRoutes.js file ko use karo
+app.use('/api/users', require('./routes/userRoutes'));
+
 
 // Server Port
 const PORT = process.env.PORT || 5000;
