@@ -15,7 +15,9 @@ const postSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
-  // Status field yahan se hata di gayi hai
+  imageUrl: {
+    type: String,
+  },
 }, { timestamps: true });
 
 const Post = mongoose.model('Post', postSchema);
