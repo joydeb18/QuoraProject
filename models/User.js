@@ -1,6 +1,5 @@
 const mongoose = require('mongoose');
 
-// User ka schema, jismein 'role' bhi hai
 const userSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -9,18 +8,23 @@ const userSchema = new mongoose.Schema({
   email: {
     type: String,
     required: true,
-    unique: true,
+    unique: true, // Yahan 'unique' rehna zaroori hai
   },
-  passwordHash: { // Hum password ko hash karke isme save karenge
+  passwordHash: {
     type: String,
     required: true,
   },
   role: {
     type: String,
-    enum: ['user', 'admin'], // Sirf yeh do values ho sakti hain.
-    default: 'user',        // Har naya user automatic 'user' hi banega.
+    enum: ['user', 'admin'],
+    default: 'user',
   },
-});
+  status: {
+    type: String,
+    enum: ['active', 'disabled'], // Ab yahan sirf active/disabled hai
+    default: 'active',
+  }
+}, { timestamps: true }); // Yeh 'createdAt' aur 'updatedAt' fields add kar dega
 
 const User = mongoose.model('User', userSchema);
 module.exports = User;
