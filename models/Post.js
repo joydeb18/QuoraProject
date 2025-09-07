@@ -4,23 +4,19 @@ const postSchema = new mongoose.Schema({
   title: {
     type: String,
     required: true,
-    trim: true, // Faltu space hata dega
+    trim: true,
   },
   content: {
     type: String,
     required: true,
   },
   author: {
-    type: mongoose.Schema.Types.ObjectId, // Yeh User model se link hoga
-    ref: 'User', // 'User' model ka reference
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true,
   },
-  status: {
-    type: String,
-    enum: ['draft', 'published'],
-    default: 'draft',
-  },
-}, { timestamps: true }); // 'createdAt' aur 'updatedAt' fields add kar dega
+  // Status field yahan se hata di gayi hai
+}, { timestamps: true });
 
 const Post = mongoose.model('Post', postSchema);
 module.exports = Post;
