@@ -6,6 +6,8 @@ exports.getAllPosts = async (req, res) => {
     console.log("getAllPosts API call hui!");
     try {
         const posts = await Post.find({}).populate('author', 'username').sort({ createdAt: -1 });
+        // Ek aur jaasoos, yeh check karne ke liye ki database se kuch mila ya nahi
+        console.log(`Database se ${posts.length} posts mile.`);
         res.json({ success: true, posts: posts });
     } catch (err) {
         console.error("getAllPosts mein error:", err.message);
@@ -30,7 +32,7 @@ exports.createPost = async (req, res) => {
         };
 
         if (req.file) {
-            newPostData.imageUrl = req.file.path;
+            newPostData.imageUrl = req.file.path.replace(/\\/g, "/");
         }
 
         const newPost = new Post(newPostData);
@@ -47,7 +49,7 @@ exports.createPost = async (req, res) => {
     }
 };
 
-// ... (baaki ke functions jaise getPostById, deletePost, etc. yahan aayenge) ...
+// Baaki ke functions (get by ID, delete)
 exports.getPostById = async (req, res) => {
     try {
         const post = await Post.findById(req.params.id).populate('author', 'username');
