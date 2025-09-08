@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const multer = require('multer');
 const path = require('path');
-
 const postController = require("../controllers/postController");
 const adminMiddleware = require("../middleware/adminMiddleware");
 
@@ -16,9 +15,10 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 // Routes
-router.get("/", adminMiddleware, postController.getAllPosts);
+router.get("/", adminMiddleware, postController.getAllPosts); // Yeh route 'getAllPosts' ko call karta hai
 router.get("/:id", adminMiddleware, postController.getPostById);
 router.post("/", adminMiddleware, upload.single('image'), postController.createPost);
+router.put("/:id", adminMiddleware, upload.single('image'), postController.updatePost);
 router.delete("/:id", adminMiddleware, postController.deletePost);
 
 module.exports = router;
