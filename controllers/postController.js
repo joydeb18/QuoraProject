@@ -87,8 +87,8 @@ exports.createPost = async (req, res) => {
             categorySlug,
             subcategorySlug
         };
-        if (req.file) {
-            newPostData.imageUrl = req.file.path.replace(/\\/g, "/");
+        if (req.files && req.files.length > 0) {
+            newPostData.imageUrls = req.files.map(file => file.path.replace(/\\/g, "/"));
         }
         const newPost = new Post(newPostData);
         const savedPost = await newPost.save();
@@ -108,8 +108,12 @@ exports.updatePost = async (req, res) => {
         }
         post.title = title || post.title;
         post.content = content || post.content;
-        if (req.file) {
-            post.imageUrl = req.file.path.replace(/\\/g, "/");
+        if (req.files && req.files.length > 0) {
+            const newImageUrls = req.files.map(file => file.path.replace(/\\/g, "/"));
+            // Combine existing and new URLs, then remove duplicates using a Set
+            const combinedImageUrls = [...(post.imageUrls || []), ...newImageUrls];
+            post.imageUrls = Array.from(new Set(combinedImageUrls));
+            console.log("Updated imageUrls after deduplication:", post.imageUrls);
         }
         const updatedPost = await post.save();
         res.json({ success: true, message: 'Post successfully update ho gaya!', post: updatedPost });

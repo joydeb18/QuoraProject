@@ -15,8 +15,8 @@ const postSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
-  imageUrl: {
-    type: String,
+  imageUrls: {
+    type: [String],
   },
   authorSnapshot: {
     _id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },

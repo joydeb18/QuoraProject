@@ -25,8 +25,8 @@ router.get("/:id", authMiddleware, postController.getPostById);
 
 // In teen routes par sirf admin aa sakta hai (isliye adminMiddleware hai)
 // POST /api/posts (multipart/form-data)
-router.post("/", adminMiddleware, upload.single('image'), postController.createPost);
-router.put("/:id", adminMiddleware, upload.single('image'), postController.updatePost);
+router.post("/", adminMiddleware, upload.array('images', 10), postController.createPost);
+router.put("/:id", adminMiddleware, upload.array('images', 10), postController.updatePost);
 router.delete("/:id", adminMiddleware, postController.deletePost);
 router.get("/:categorySlug/:subcategorySlug", authMiddleware, postController.getPostsBySubcategory);
 
