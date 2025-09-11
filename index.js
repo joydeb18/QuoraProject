@@ -6,8 +6,9 @@ require('dotenv').config();
 const app = express();
 
 const ALLOWED_ORIGINS = [
-  process.env.FRONTEND_ORIGIN || 'https://quora-project-frontend.vercel.app',
-  'http://localhost:3000' // For local development
+  'https://quora-project-frontend.vercel.app', // Explicitly added for production
+  'http://localhost:3000', // For local development
+  process.env.FRONTEND_ORIGIN // Keep this in case user sets it for other dev environments
 ];
 
 app.use(cors({
