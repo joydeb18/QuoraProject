@@ -113,7 +113,6 @@ exports.updatePost = async (req, res) => {
             // Combine existing and new URLs, then remove duplicates using a Set
             const combinedImageUrls = [...(post.imageUrls || []), ...newImageUrls];
             post.imageUrls = Array.from(new Set(combinedImageUrls));
-            console.log("Updated imageUrls after deduplication:", post.imageUrls);
         }
         const updatedPost = await post.save();
         res.json({ success: true, message: 'Post successfully update ho gaya!', post: updatedPost });

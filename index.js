@@ -5,9 +5,19 @@ require('dotenv').config();
 
 const app = express();
 
-const ALLOWED_ORIGIN = process.env.FRONTEND_ORIGIN || 'https://quora-project-frontend.vercel.app';
+const ALLOWED_ORIGINS = [
+  process.env.FRONTEND_ORIGIN || 'https://quora-project-frontend.vercel.app',
+  'http://localhost:3000' // For local development
+];
+
 app.use(cors({
-  origin: ALLOWED_ORIGIN,
+  origin: function (origin, callback) {
+    if (!origin || ALLOWED_ORIGINS.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   allowedHeaders: ['Content-Type', 'x-auth-token']
 }));
