@@ -12,7 +12,7 @@ const ALLOWED_ORIGINS = [
 ];
 
 app.use(cors({
-  origin: '*', // Allow all origins for testing
+  origin: ALLOWED_ORIGINS,
   credentials: true,
   allowedHeaders: ['Content-Type', 'x-auth-token']
 }));
