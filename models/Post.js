@@ -18,7 +18,25 @@ const postSchema = new mongoose.Schema({
   imageUrl: {
     type: String,
   },
+  authorSnapshot: {
+    _id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    username: { type: String }
+  },
+  categorySlug: {
+    type: String,
+    index: true,
+    lowercase: true,
+    trim: true
+  },
+  subcategorySlug: {
+    type: String,
+    index: true,
+    lowercase: true,
+    trim: true
+  }
 }, { timestamps: true });
+
+postSchema.index({ categorySlug: 1, subcategorySlug: 1, createdAt: -1 });
 
 const Post = mongoose.model('Post', postSchema);
 module.exports = Post;

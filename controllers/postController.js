@@ -1,12 +1,44 @@
 const Post = require('../models/Post');
+const Category = require('../models/Category');
+const mongoose = require('mongoose');
+const User = require('../models/User');
+
+function isValidObjectId(id) {
+    return mongoose.Types.ObjectId.isValid(id);
+}
+
+async function resolveCategorySlug(input) {
+    if (!input) return undefined;
+    if (isValidObjectId(input)) {
+        const cat = await Category.findById(input).lean();
+        return cat ? cat.slug : undefined;
+    }
+    return String(input).toLowerCase();
+}
+
+async function resolveSubcategorySlug(categoryIdentifier, subIdentifier) {
+    if (!subIdentifier) return undefined;
+    const category = isValidObjectId(categoryIdentifier)
+        ? await Category.findById(categoryIdentifier)
+        : await Category.findOne({ slug: String(categoryIdentifier).toLowerCase() });
+    if (!category) return undefined;
+    if (isValidObjectId(subIdentifier)) {
+        const sub = category.subcategories.id(subIdentifier);
+        return sub ? sub.slug : undefined;
+    }
+    return String(subIdentifier).toLowerCase();
+}
 
 // Dish 1: Saare posts ki list bhejna (Updated and Cleaned)
 exports.getAllPosts = async (req, res) => {
     // === JAASOOS WALI LINE ===
     console.log("getAllPosts API call hui!");
     try {
-        // Hum author ki ID ki jagah uska 'username' laane ke liye .populate() ka use kar rahe hain
-        const posts = await Post.find({}).populate('author', 'username').sort({ createdAt: -1 });
+        const { category, subcategory } = req.query;
+        const filter = {};
+        if (category) filter.categorySlug = String(category).toLowerCase();
+        if (subcategory) filter.subcategorySlug = String(subcategory).toLowerCase();
+        const posts = await Post.find(filter).populate('author', 'username').sort({ createdAt: -1 });
         
         // Ek aur jaasoos, yeh check karne ke liye ki database se kuch mila ya nahi
         console.log(`Database se ${posts.length} posts mile.`);
@@ -36,12 +68,25 @@ exports.getPostById = async (req, res) => {
 // Dish 3: Ek naya post banana
 exports.createPost = async (req, res) => {
     try {
-        const { title, content } = req.body;
-        const authorId = req.user.id; 
+        const { title, content, category, subcategory } = req.body;
+        const authorId = req.user.id;
         if (!title || !content) {
             return res.status(400).json({ success: false, message: 'Title aur content, dono zaroori hain.' });
         }
-        const newPostData = { title, content, author: authorId };
+
+        const categorySlug = await resolveCategorySlug(category);
+        const subcategorySlug = category ? await resolveSubcategorySlug(category, subcategory) : undefined;
+
+        const authorUser = await User.findById(authorId).select('username').lean();
+
+        const newPostData = {
+            title,
+            content,
+            author: authorId,
+            authorSnapshot: authorUser ? { _id: authorId, username: authorUser.username } : undefined,
+            categorySlug,
+            subcategorySlug
+        };
         if (req.file) {
             newPostData.imageUrl = req.file.path.replace(/\\/g, "/");
         }
