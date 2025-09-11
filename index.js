@@ -12,13 +12,7 @@ const ALLOWED_ORIGINS = [
 ];
 
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || ALLOWED_ORIGINS.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
+  origin: '*', // Allow all origins for testing
   credentials: true,
   allowedHeaders: ['Content-Type', 'x-auth-token']
 }));
